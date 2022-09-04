@@ -17,17 +17,19 @@ st.sidebar.markdown("""---""")
 
 # Load source data
 uploaded_file = st.sidebar.file_uploader('Load sample data in XLSX format', type='xlsx')
-if uploaded_file is None:
-    exit()
+if uploaded_file is not None:
 
-pks = pKSpectrum(uploaded_file)
+    pks = pKSpectrum(uploaded_file)
 
-st.sidebar.markdown("""---""")
+    st.sidebar.markdown("""---""")
 
-st.sidebar.subheader('Sample information')
-st.sidebar.write(f'Sample name: {pks.sample_name}')
-st.sidebar.write(f'Comment: {pks.comment}')
-st.sidebar.write(f'Date: {pks.date}')
-st.sidebar.write(f'Time: {pks.time}')
-st.sidebar.write(f'Sample volume: {pks.sample_volume}')
-st.sidebar.write(f'Alkaline concentration: {pks.alkaline_concentration}')
+    st.sidebar.subheader('Sample information')
+    for label, item in [
+        ('Sample name', pks.sample_name),
+        ('Comment', pks.comment),
+        ('Date', pks.date),
+        ('Time', pks.time),
+        ('Sample volume', pks.sample_volume),
+        ('Alkaline concentration', pks.alkaline_concentration)
+    ]:
+        st.sidebar.write(f'{label}: {item}')
