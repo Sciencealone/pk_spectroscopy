@@ -48,7 +48,11 @@ if uploaded_file is not None:
                 title=title,
                 x_axis_label='Titrant volume',
                 y_axis_label='pH')
-            p.line(pks.alkaline_volumes, pks.ph_values, line_width=2)
+            p.line(pks.alkaline_volumes, pks.ph_values, line_width=2, legend_label='All data')
+            valid_x = pks.alkaline_volumes[:pks.valid_points]
+            valid_y = pks.ph_values[:pks.valid_points]
+            p.scatter(valid_x, valid_y, color='red', legend_label='Valid points')
+            p.legend.location = 'top_left'
             st.bokeh_chart(p, use_container_width=True)
         else:
             st.write('Not enough data!')

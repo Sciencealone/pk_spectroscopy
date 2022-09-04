@@ -1,5 +1,7 @@
 from openpyxl import load_workbook
 
+Kw = 1e-14
+
 
 class pKSpectrum():
     def __init__(self, source_file):
@@ -12,6 +14,8 @@ class pKSpectrum():
         self.alkaline_concentration = None
         self.alkaline_volumes = []
         self.ph_values = []
+        self.alpha_values = []
+        self.valid_points = None
 
         self._load_data()
 
@@ -38,6 +42,29 @@ class pKSpectrum():
                 self.alkaline_volumes.append(volume)
                 self.ph_values.append(ph)
                 shift += 1
+            else:
+                break
+
+        # Arrange titration data
+        swapped = False
+        while True:
+            for i in range(len(self.alkaline_volumes)-1):
+                if self.alkaline_volumes[i] > self.alkaline_volumes[i+1]:
+                    swapped = True
+                    self.alkaline_volumes[i], self.alkaline_volumes[i+1] = \
+                        self.alkaline_volumes[i+1], self.alkaline_volumes[i]
+                    self.ph_values[i], self.ph_values[i+1] = self.ph_values[i+1], self.ph_values[i]
+            if not swapped:
+                break
+
+        # Check data validity
+        for i in range(len(self.alkaline_volumes)):
+            h = pow(10, -self.ph_values[i])
+            t = ((h - Kw / h) / self.sample_volume) * (self.alkaline_volumes[i] + self.sample_volume) + \
+                self.alkaline_concentration * self.alkaline_volumes[i] / self.sample_volume
+            if t >= 0:
+                self.alpha_values.append(t)
+                self.valid_points = i + 1
             else:
                 break
 
