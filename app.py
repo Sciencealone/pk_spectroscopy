@@ -1,6 +1,8 @@
+import os
 import pandas as pd
 import streamlit as st
 from bokeh.plotting import figure
+from bokeh.models import ColumnDataSource, Segment, Range1d
 from pk_spectrum import pKSpectrum
 
 st.title('pK spectroscopy app')
@@ -73,11 +75,34 @@ if uploaded_file is not None:
     # Get and display results
     peaks, error = pks.make_calculation(pk_start, pk_end, d_pk)
     result_df = pd.DataFrame(peaks)
+    result_df = result_df[['concentration', 'mean', 'interval']].copy()
     if not result_df.empty:
         with st.expander('Results', expanded=True):
             st.write('Peaks:')
-            st.write(result_df[['concentration', 'mean', 'interval']])
+            st.write(result_df)
+
+            # Provide download data
+            prefix, ext = os.path.splitext(uploaded_file.name)
+            csv = result_df.to_csv().encode('utf-8')
+            st.download_button(
+                'Download table as CSV',
+                csv,
+                prefix + '.csv',
+                'text/csv',
+                key='download-csv'
+            )
             st.write(f'Error: {error:.5}')
+
+            # Plot chart
+            p = figure(
+                title=f'pK plot ({pks.sample_name})',
+                x_axis_label='pK',
+                y_axis_label='Concentration')
+            p.x_range = Range1d(pk_start, pk_end)
+            source = ColumnDataSource(result_df)
+            glyph = Segment(x0='mean', y0=0, x1='mean', y1='concentration', line_width=3)
+            p.add_glyph(source, glyph)
+            st.bokeh_chart(p, use_container_width=True)
 
 else:
     st.write('⬅ Waiting for a data file in the sidebar.')
