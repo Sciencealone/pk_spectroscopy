@@ -73,19 +73,32 @@ class pKSpectrum:
             else:
                 break
 
-    def make_calculation(self, pk_start, pk_end, d_pk):
+    def make_calculation(self, pk_start, pk_end, d_pk, integration_constant):
 
         # Calculate constant step
         pk_step = round((pk_end - pk_start) / d_pk) + 1
 
         # Fill right part
-        right = np.zeros((self.valid_points, pk_step))
+        if integration_constant:
+            shape_1 = pk_step + 2
+        else:
+            shape_1 = pk_step
+        right = np.zeros((self.valid_points, shape_1))
         for i in range(self.valid_points):
             for j in range(pk_step):
                 right[i, j] = d_pk / (1 + np.exp(LOG10 * (pk_start + d_pk * j - self.ph_values[i])))
 
+        # Add items for the constant calculation
+        if integration_constant:
+            right[:, -2] = 1
+            right[:, -1] = -1
+
         # Solve equation
         constants, residual = nnls(right, np.array(self.alpha_values))
+
+        # Remove constant from scope
+        if integration_constant:
+            constants = constants[:-2]
 
         # Normalization
         constants *= d_pk

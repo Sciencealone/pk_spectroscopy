@@ -62,9 +62,10 @@ if uploaded_file is not None:
 
     # Gather main control variables expander
     with st.expander('Parameters', expanded=True):
-        pk_start = st.number_input('Start pK:', value=0., min_value=0., max_value=10.)
-        pk_end = st.number_input('End pK:', value=10., min_value=0., max_value=10.)
-        d_pk = st.number_input('pK step (0.05-0.1 recommended):', value=.05, min_value=0.01, max_value=1.)
+        pk_start = st.number_input('Start pK (0 recommended):', value=0., min_value=0., max_value=10.)
+        pk_end = st.number_input('End pK (10 recommended):', value=10., min_value=0., max_value=10.)
+        d_pk = st.number_input('pK step (0.05-0.1 recommended):', value=.05, min_value=0., max_value=1.)
+        integration_constant = st.checkbox('Use integration constant (recommended).', value=True)
 
     # Check values
     if pk_start > pk_end:
@@ -73,7 +74,7 @@ if uploaded_file is not None:
         d_pk = 0.05
 
     # Get and display results
-    peaks, error = pks.make_calculation(pk_start, pk_end, d_pk)
+    peaks, error = pks.make_calculation(pk_start, pk_end, d_pk, integration_constant)
     result_df = pd.DataFrame(peaks)
     result_df = result_df[['concentration', 'mean', 'interval']].copy()
     if not result_df.empty:
@@ -85,7 +86,7 @@ if uploaded_file is not None:
             prefix, ext = os.path.splitext(uploaded_file.name)
             csv = result_df.to_csv().encode('utf-8')
             st.download_button(
-                'Download table as CSV',
+                'Download table (CSV)',
                 csv,
                 prefix + '.csv',
                 'text/csv',
