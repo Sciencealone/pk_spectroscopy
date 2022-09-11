@@ -6,7 +6,8 @@ Kw = 1e-14
 LOG10 = np.log(10)
 TOLERANCE = 1e-6
 
-class pKSpectrum():
+
+class pKSpectrum:
     def __init__(self, source_file):
         self.source_file = source_file
         self.sample_name = None
@@ -81,7 +82,7 @@ class pKSpectrum():
         right = np.zeros((self.valid_points, pk_step))
         for i in range(self.valid_points):
             for j in range(pk_step):
-                right[i, j] = d_pk / (1 + np.exp(LOG10 * pk_start + d_pk * j - self.ph_values[i]))
+                right[i, j] = d_pk / (1 + np.exp(LOG10 * (pk_start + d_pk * j - self.ph_values[i])))
 
         # Solve equation
         constants, residual = nnls(right, np.array(self.alpha_values))
