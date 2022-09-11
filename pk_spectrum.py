@@ -25,6 +25,10 @@ class pKSpectrum:
         self._load_data()
 
     def _load_data(self):
+        """
+        Loads data and makes a simple check
+        :return: None
+        """
 
         # Load workbook
         wb = load_workbook(self.source_file)
@@ -73,7 +77,15 @@ class pKSpectrum:
             else:
                 break
 
-    def make_calculation(self, pk_start, pk_end, d_pk, integration_constant):
+    def make_calculation(self, pk_start=0, pk_end=10, d_pk=0.05, integration_constant=True):
+        """
+        Calculates pK spectrum
+        :param pk_start: Start pK value (float)
+        :param pk_end: End pK value (float)
+        :param d_pk: Delta pK value (float)
+        :param integration_constant: Use integration constant? (boolean)
+        :return: Peaks, calculation error
+        """
 
         # Calculate constant step
         pk_step = round((pk_end - pk_start) / d_pk) + 1
@@ -157,4 +169,9 @@ class pKSpectrum:
 
     @staticmethod
     def _check_number(a):
+        """
+        Checks if argument is number
+        :param a: Value to check (any)
+        :return: Check result (boolean)
+        """
         return type(a) == int or type(a) == float
