@@ -11,7 +11,7 @@ st.set_page_config(page_title='pK Spectrum')
 
 
 st.title('pK spectroscopy app')
-st.markdown('[Get more detail in Github repository](https://github.com/Sciencealone/pkspec-streamlit)')
+st.markdown('[Get more detail in Github repository ➡](https://github.com/Sciencealone/pkspec-streamlit)')
 
 # Provide template for the data
 st.sidebar.write('Please use this template to enter sample data')
@@ -113,3 +113,5 @@ if uploaded_file is not None:
 
 else:
     st.write('⬅ Waiting for a data file in the sidebar.')
+    st.write('You may use some samples from the [repository]'
+             '(https://github.com/Sciencealone/pkspec-streamlit/tree/main/samples).')
