@@ -105,9 +105,9 @@ else:
              '(https://github.com/Sciencealone/pkspec-streamlit/tree/main/samples).')
 
     # Provide template for the data
-    st.sidebar.write('Please use this template to enter the sample data')
+    st.write('Please use this template to enter the sample data:')
     with open('data/sample.xltx', 'rb') as file:
-        btn = st.sidebar.download_button(
+        btn = st.download_button(
             label='Excel 2007+ template',
             data=file,
             file_name='sample.xltx',
