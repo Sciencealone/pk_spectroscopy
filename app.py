@@ -5,7 +5,13 @@ from bokeh.plotting import figure
 from bokeh.models import ColumnDataSource, Segment, Range1d
 from pk_spectrum import pKSpectrum
 
+
+# Change app page parameters
+st.set_page_config(page_title='pK Spectrum')
+
+
 st.title('pK spectroscopy app')
+st.markdown('[Get more detail in Github repository](https://github.com/Sciencealone/pkspec-streamlit)')
 
 # Provide template for the data
 st.sidebar.write('Please use this template to enter sample data')
