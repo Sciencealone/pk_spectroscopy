@@ -101,7 +101,7 @@ if uploaded_file is not None:
 
 else:
     st.write('⬅ Waiting for a data file in the sidebar.')
-    st.write('You may use some [samples](https://github.com/Sciencealone/pkspec-streamlit/tree/main/samples) '
+    st.write('You may use some [samples](https://github.com/Sciencealone/pkspec-streamlit/tree/main/data) '
              'from the repository.')
 
     # Provide template for the data
