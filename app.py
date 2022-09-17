@@ -13,18 +13,6 @@ st.set_page_config(page_title='pK Spectrum')
 st.title('pK spectroscopy app')
 st.markdown('[Get more detail in Github repository ➡](https://github.com/Sciencealone/pkspec-streamlit)')
 
-# Provide template for the data
-st.sidebar.write('Please use this template to enter sample data')
-with open('data/sample.xltx', 'rb') as file:
-    btn = st.sidebar.download_button(
-        label='Excel 2007+ template',
-        data=file,
-        file_name='sample.xltx',
-        mime='application/vnd.openxmlformats-officedocument.spreadsheetml.template'
-    )
-
-st.sidebar.markdown("""---""")
-
 # Load source data
 uploaded_file = st.sidebar.file_uploader('Load sample data in XLSX format', type='xlsx')
 if uploaded_file is not None:
@@ -115,3 +103,13 @@ else:
     st.write('⬅ Waiting for a data file in the sidebar.')
     st.write('You may use some samples from the [repository]'
              '(https://github.com/Sciencealone/pkspec-streamlit/tree/main/samples).')
+
+    # Provide template for the data
+    st.sidebar.write('Please use this template to enter the sample data')
+    with open('data/sample.xltx', 'rb') as file:
+        btn = st.sidebar.download_button(
+            label='Excel 2007+ template',
+            data=file,
+            file_name='sample.xltx',
+            mime='application/vnd.openxmlformats-officedocument.spreadsheetml.template'
+        )
