@@ -4,7 +4,7 @@
 
 ## Описание
 
-This app is intended to calculate the pK spectra using results of the potentiometric titration of wine production and other materials of the complex acidic nature.
+Приложение предназначено для расчёта pK-спектров винопродукции и других материалов сложного кислотного состава по результатам потенциометрического титрования.
 
 ## Теория
 
