@@ -15,7 +15,7 @@
 ### Интернет
 Приложение доступно в Streamlit cloud:
 
-https://sciencealone-pkspec-streamlit-app-09dely.streamlitapp.com/
+https://sciencealone-pkspec-streamlit-app-ejxg41.streamlitapp.com/
 
 ### Локальное размещение
 

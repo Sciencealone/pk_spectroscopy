@@ -15,7 +15,7 @@ The chapter is under development.
 ### Internet
 App is available on Streamlit cloud:
 
-https://sciencealone-pkspec-streamlit-app-09dely.streamlitapp.com/
+https://sciencealone-pkspec-streamlit-app-ejxg41.streamlitapp.com/
 
 ### Local deployment
 
