@@ -1,25 +1,37 @@
+from enum import Enum
 import numpy as np
 from scipy.optimize import nnls
 from openpyxl import load_workbook
 
 Kw = 1e-14
+F = 96485
 LOG10 = np.log(10)
 TOLERANCE = 1e-6
 
 
+class TitrationModes(Enum):
+    VOLUMETRIC = 1
+    COULOMETRIC = 2
+
+
 class pKSpectrum:
-    def __init__(self, source_file):
+    def __init__(self,
+                 source_file,
+                 mode: TitrationModes = TitrationModes.VOLUMETRIC):
         self.source_file = source_file
+        self.mode = mode
         self.sample_name = None
         self.comment = None
         self.date = None
         self.time = None
         self.sample_volume = None
         self.alkaline_concentration = None
+        self.current = None
         self.alkaline_volumes = []
+        self.times = []
         self.ph_values = []
         self.alpha_values = []
-        self.valid_points = None
+        self.valid_points = 0
         self.acid_peaks = []
 
         self._load_data()
@@ -39,7 +51,10 @@ class pKSpectrum:
         self.comment = ws['A2'].value
         self.timestamp = ws['A3'].value
         self.sample_volume = ws['A4'].value
-        self.alkaline_concentration = ws['A5'].value
+        if self.mode == TitrationModes.VOLUMETRIC:
+            self.alkaline_concentration = ws['A5'].value
+        else:
+            self.current = ws['A5'].value
 
         # Get titration data
         shift = 0
@@ -66,11 +81,19 @@ class pKSpectrum:
             if not swapped:
                 break
 
+        # Transform volume data to time if needed
+        if self.mode == TitrationModes.COULOMETRIC:
+            self.times = list(self.alkaline_volumes)
+            self.alkaline_volumes = []
+
         # Check data validity
         for i in range(len(self.alkaline_volumes)):
             h = pow(10, -self.ph_values[i])
-            t = ((h - Kw / h) / self.sample_volume) * (self.alkaline_volumes[i] + self.sample_volume) + \
-                self.alkaline_concentration * self.alkaline_volumes[i] / self.sample_volume
+            if self.mode == TitrationModes.VOLUMETRIC:
+                t = ((h - Kw / h) / self.sample_volume) * (self.alkaline_volumes[i] + self.sample_volume) + \
+                    self.alkaline_concentration * self.alkaline_volumes[i] / self.sample_volume
+            else:
+                t = h - Kw / h + self.current * self.times[i] / F / self.sample_volume
             if t >= 0:
                 self.alpha_values.append(t)
                 self.valid_points = i + 1
@@ -86,6 +109,10 @@ class pKSpectrum:
         :param integration_constant: Use integration constant? (boolean)
         :return: Peaks, calculation error
         """
+
+        # Check for the valid points
+        if self.valid_points < 7:
+            return None, np.nan
 
         # Calculate constant step
         pk_step = round((pk_end - pk_start) / d_pk) + 1
