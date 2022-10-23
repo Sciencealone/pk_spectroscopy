@@ -8,7 +8,7 @@ This app is intended to calculate the pK spectra using results of the potentiome
 
 ## Theory
 
-The chapter is under development.
+The theory of pK-spectroscopy is described in the [following document](docs/theory-en.md).
 
 ## Deployment
 
