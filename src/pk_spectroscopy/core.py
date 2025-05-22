@@ -1,29 +1,53 @@
+from __future__ import annotations
+
 from enum import Enum
 import numpy as np
 from scipy.optimize import nnls
-from openpyxl import load_workbook
 
-Kw = 1e-14
-F = 96485
-LOG10 = np.log(10)
-TOLERANCE = 1e-6
+# Default constants
+Kw = 1e-14  # Ion product of water
+F = 96485  # Faraday constant
+LOG10 = np.log(10)  # Binary algorithm of 10
+TOLERANCE = 1e-6  # Default convergence tolerance
+PK_START = 0.0  # Start of pK search range
+PK_END = 10.0  # End of pK search range
+D_PK = 0.05  # Resolution of pK values
+USE_INTEGRATION_CONSTANT = True  # Use the integration constant
 
 
-class TitrationModes(Enum):
+class TitrationMode(Enum):
+    """
+    Implementation of the titration mode selection
+    """
     VOLUMETRIC = 1
     COULOMETRIC = 2
 
 
-class pKSpectrum:
-    def __init__(self,
-                 source_file,
-                 mode: TitrationModes = TitrationModes.VOLUMETRIC):
-        self.source_file = source_file
+class pK_Spectroscopy:
+    """
+    Base pK spectroscopy class
+    :param mode: Mode of titration
+    :param tolerance: Calculation tolerance
+    :param pk_start: Starting point of the pK search
+    :param pk_end: Ending point of the pK search
+    :param d_pk: pK search resolution
+    :param use_integration_constant: Use integration constant
+    """
+    def __init__(
+            self,
+            mode: TitrationMode = TitrationMode.VOLUMETRIC,
+            tolerance: float = TOLERANCE,
+            pk_start: float = PK_START,
+            pk_end: float = PK_END,
+            d_pk: float = D_PK,
+            use_integration_constant: bool = USE_INTEGRATION_CONSTANT,
+    ):
         self.mode = mode
-        self.sample_name = None
-        self.comment = None
-        self.date = None
-        self.time = None
+        self.tolerance = tolerance
+        self.pk_start = pk_start
+        self.pk_end = pk_end
+        self.d_pk = d_pk
+        self.use_integration_constant = use_integration_constant
         self.sample_volume = None
         self.alkaline_concentration = None
         self.current = None
@@ -34,62 +58,50 @@ class pKSpectrum:
         self.valid_points = 0
         self.acid_peaks = []
 
-        self._load_data()
-
-    def _load_data(self):
+    def load_data(
+            self,
+            sample_volume: float,
+            alkaline_concentration_or_current: float,
+            volumes: list[float],
+            ph_values: list[float],
+    ):
         """
-        Loads data and makes a simple check
+        Loads the titration data
+        :param sample_volume: Volume of the sample (ml)
+        :param alkaline_concentration_or_current: Concentration of the titrant (mol/l) or titration current (A)
+        :param volumes: Volumes of the titration points (ml)
+        :param ph_values: pH values of the titration points
         :return: None
         """
-
-        # Load workbook
-        wb = load_workbook(self.source_file)
-        ws = wb.active
-
         # Get sample information
-        self.sample_name = ws['A1'].value
-        self.comment = ws['A2'].value
-        self.timestamp = ws['A3'].value
-        self.sample_volume = ws['A4'].value
-        if self.mode == TitrationModes.VOLUMETRIC:
-            self.alkaline_concentration = ws['A5'].value
+        self.sample_volume = sample_volume
+        if self.mode == TitrationMode.VOLUMETRIC:
+            self.alkaline_concentration = alkaline_concentration_or_current
         else:
-            self.current = ws['A5'].value
-
-        # Get titration data
-        shift = 0
-        while True:
-            volume = ws[f'A{6 + shift}'].value
-            ph = ws[f'B{6 + shift}'].value
-
-            if self._check_number(volume) and self._check_number(ph):
-                self.alkaline_volumes.append(volume)
-                self.ph_values.append(ph)
-                shift += 1
-            else:
-                break
+            self.current = alkaline_concentration_or_current
 
         # Arrange titration data
-        swapped = False
-        while True:
-            for i in range(len(self.alkaline_volumes)-1):
-                if self.alkaline_volumes[i] > self.alkaline_volumes[i+1]:
-                    swapped = True
-                    self.alkaline_volumes[i], self.alkaline_volumes[i+1] = \
-                        self.alkaline_volumes[i+1], self.alkaline_volumes[i]
-                    self.ph_values[i], self.ph_values[i+1] = self.ph_values[i+1], self.ph_values[i]
-            if not swapped:
-                break
+        combined = list(zip(volumes, ph_values))
+        combined.sort(key=lambda x: x[0])
+        volumes, ph_values = zip(*combined)
+        volumes = list(volumes)
+        ph_values = list(ph_values)
+
+        if len(volumes) == len(ph_values):
+            self.alkaline_volumes = volumes
+            self.ph_values = ph_values
+        else:
+            raise ValueError('Volumes and ph values must have same length!')
 
         # Transform volume data to time if needed
-        if self.mode == TitrationModes.COULOMETRIC:
+        if self.mode == TitrationMode.COULOMETRIC:
             self.times = list(self.alkaline_volumes)
             self.alkaline_volumes = []
 
         # Check data validity
         for i in range(len(self.alkaline_volumes)):
             h = pow(10, -self.ph_values[i])
-            if self.mode == TitrationModes.VOLUMETRIC:
+            if self.mode == TitrationMode.VOLUMETRIC:
                 t = ((h - Kw / h) / self.sample_volume) * (self.alkaline_volumes[i] + self.sample_volume) + \
                     self.alkaline_concentration * self.alkaline_volumes[i] / self.sample_volume
             else:
@@ -98,15 +110,21 @@ class pKSpectrum:
                 self.alpha_values.append(t)
                 self.valid_points = i + 1
             else:
-                break
+                raise ValueError('Wrong titration data!')
 
-    def make_calculation(self, pk_start=0, pk_end=10, d_pk=0.05, integration_constant=True):
+    def make_calculation(
+            self,
+            pk_start: float = PK_START,
+            pk_end: float = PK_END,
+            d_pk: float = D_PK,
+            use_integration_constant: bool = USE_INTEGRATION_CONSTANT,
+    ):
         """
         Calculates pK spectrum
-        :param pk_start: Start pK value (float)
-        :param pk_end: End pK value (float)
-        :param d_pk: Delta pK value (float)
-        :param integration_constant: Use integration constant? (boolean)
+        :param pk_start: Starting point of the pK search
+        :param pk_end: Ending point of the pK search
+        :param d_pk: pK search resolution
+        :param use_integration_constant: Use integration constant
         :return: Peaks, calculation error
         """
 
@@ -115,20 +133,20 @@ class pKSpectrum:
             return None, np.nan
 
         # Calculate constant step
-        pk_step = round((pk_end - pk_start) / d_pk) + 1
+        pk_step = round((self.pk_end - self.pk_start) / self.d_pk) + 1
 
-        # Fill right part
-        if integration_constant:
+        # Fill the right part
+        if self.use_integration_constant:
             shape_1 = pk_step + 2
         else:
             shape_1 = pk_step
         right = np.zeros((self.valid_points, shape_1))
         for i in range(self.valid_points):
             for j in range(pk_step):
-                right[i, j] = d_pk / (1 + np.exp(LOG10 * (pk_start + d_pk * j - self.ph_values[i])))
+                right[i, j] = self.d_pk / (1 + np.exp(LOG10 * (self.pk_start + self.d_pk * j - self.ph_values[i])))
 
         # Add items for the constant calculation
-        if integration_constant:
+        if self.use_integration_constant:
             right[:, -2] = 1
             right[:, -1] = -1
 
@@ -136,13 +154,13 @@ class pKSpectrum:
         constants, residual = nnls(right, np.array(self.alpha_values))
 
         # Remove constant from scope
-        if integration_constant:
+        if self.use_integration_constant:
             constants = constants[:-2]
 
         # Normalization
-        constants *= d_pk
+        constants *= self.d_pk
 
-        # Truncate border artefacts
+        # Truncate border artifacts
         if constants[0] > TOLERANCE > constants[1]:
             constants[0] = 0
         if constants[-1] > TOLERANCE > constants[-2]:
@@ -173,7 +191,7 @@ class pKSpectrum:
                 peak = self.acid_peaks[i]
                 for j in range(peak['point_count']):
                     t1 += constants_relative[peak['first_point'] + j] * \
-                        (pk_start + d_pk * (peak['first_point'] + j))
+                          (self.pk_start + self.d_pk * (peak['first_point'] + j))
                     t2 += constants_relative[peak['first_point'] + j]
                 peak['mean'] = t1 / t2
             for i in range(len(self.acid_peaks)):
@@ -183,7 +201,7 @@ class pKSpectrum:
                     t2 = 0
                     for j in range(peak['point_count']):
                         t1 += constants_relative[peak['first_point'] + j] * \
-                              (pk_start + d_pk * (peak['first_point'] + j) - peak['mean']) ** 2
+                              (self.pk_start + self.d_pk * (peak['first_point'] + j) - peak['mean']) ** 2
                         t2 += constants_relative[peak['first_point'] + j]
                     peak['interval'] = 1.96 * np.sqrt(t1 / t2) / np.sqrt(peak['point_count'])
                 else:
@@ -193,12 +211,3 @@ class pKSpectrum:
         error = np.sqrt(residual) / np.sqrt(pk_step - 1)
 
         return self.acid_peaks, error
-
-    @staticmethod
-    def _check_number(a):
-        """
-        Checks if argument is number
-        :param a: Value to check (any)
-        :return: Check result (boolean)
-        """
-        return type(a) == int or type(a) == float

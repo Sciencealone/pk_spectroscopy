@@ -1,29 +1,38 @@
-# pK Spectroscopy app
+# pK Spectroscopy
 
-[Русская версия](README_RU.MD)
+Русская версия TBD
 
 ## Description
 
-This app is intended to calculate the pK spectra using results of the potentiometric titration of wine production and other materials of the complex acidic nature.
+This library is intended to perform the pK-spectroscopic evaluation of substances and mixtures of a complex acidic nature using results of the potentiometric titration. This approach could be helpful for the wine production and other natural or synthetic objects.
 
-## Theory
+For convenience, the user-friendly app is attached as the usage example for the generic cases.
 
-The theory of pK-spectroscopy is described in the [following document](docs/theory-en.md).
+## Documentation
+
+TBD
 
 ## Deployment
 
-### Internet
-App is available on Streamlit cloud:
+You can install the latest release of this package directly from PyPI:
 
-https://sciencealone-pkspec-streamlit-app-ejxg41.streamlitapp.com/
+```bash
+pip install pk_spectroscopy
+```
 
-### Local deployment
+or, alternatively, you can install the latest development version from GitHub:
 
-Please use following instructions:
+```bash
+pip install git+https://github.com/Sciencealone/pk_spectroscopy
+```
 
-https://docs.streamlit.io/library/get-started/installation
+## Running the application
 
-https://docs.streamlit.io/knowledge-base/using-streamlit/how-do-i-run-my-streamlit-script
+You can start the application GUI directly from the command-line:
+
+```bash
+pk_spectroscopy
+```
 
 ## Citation
 
