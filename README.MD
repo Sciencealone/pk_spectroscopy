@@ -1,7 +1,5 @@
 # pK Spectroscopy
 
-Русская версия TBD
-
 ## Description
 
 This library is intended to perform the pK-spectroscopic evaluation of substances and mixtures of a complex acidic nature using results of the potentiometric titration. This approach could be helpful for the wine production and other natural or synthetic objects.
@@ -10,7 +8,7 @@ For convenience, the user-friendly app is attached as the usage example for the 
 
 ## Documentation
 
-TBD
+https://pk-spectroscopy.readthedocs.io/
 
 ## Deployment
 
