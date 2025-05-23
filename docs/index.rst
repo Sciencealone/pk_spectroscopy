@@ -1,11 +1,11 @@
 pK Spectroscopy documentation
-=============================
+#############################
 
 Foundations of the theory
--------------------------
+=========================
 
 Volumetric titration
-====================
+--------------------
 
 Material was taken from the paper:
 
@@ -136,7 +136,7 @@ where :math:`t_{0.95}` - Student's coefficient for the unconditional probability
 Obtained results of the calculation of pK-spectra from the experimental data of titration of the solutions of weak acids and their mixes show that adjacent non-zero values of :math:`q_i` must be interpreted as a single peak with a maximum presenting the individual component of a system. The resolution of this method with such approach is limited by the basis step of :math:`pK (\Delta рК)`. It is advised to select this step as small as possible to improve the resolution. But the stability of solution of system (12) decreases with the smaller steps from the mathematical point of view.
 
 Coulometric titration
-=====================
+---------------------
 
 In case of the coulometric titration equation (5) can be rewritten as:
 
@@ -152,4 +152,3 @@ F - Faraday's constant.
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-
