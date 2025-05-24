@@ -148,6 +148,25 @@ where I - current,
 t - analysis time,
 F - Faraday's constant.
 
+Usage
+=====
+
+1. Prepare your data as CSV file with a semicolon (;) as separator.
+
+  Data format (some examples provided with the app):
+
+  - line 1: name (optional)
+  - line 2: sample volume (ml)
+  - line 3: titrant concentration (M) for volumetric mode or titration current (A) for coulometric mode
+  - lines 4+: titration data: volume-pH or time-pH
+
+2. Start the app with `pk_spectroscopy` command.
+
+3. Select the titration mode (left sidebar).
+
+4. Load sample data (left sidebar).
+
+5. Observe the results in the app window.
 
 .. toctree::
    :maxdepth: 2
