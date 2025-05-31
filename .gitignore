@@ -2,3 +2,4 @@
 /.idea/**
 /dist/
 /src/pk_spectroscopy.egg-info/
+/docs/_build/**
