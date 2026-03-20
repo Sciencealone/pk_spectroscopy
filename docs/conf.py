@@ -7,9 +7,9 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'pK Spectroscopy'
-copyright = '2025, Mikhail Markovskii'
+copyright = '2026, Mikhail Markovskii'
 author = 'Mikhail Markovskii'
-release = '2025'
+release = '2026'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

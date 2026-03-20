@@ -21,11 +21,11 @@ setup(
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     install_requires=[
-        "numpy==2.2.6",
-        "scipy==1.15.3",
-        "pandas==2.2.3",
-        "streamlit==1.45.1",
-        "plotly==6.1.1",
+        "numpy==2.4.3",
+        "scipy==1.17.1",
+        "pandas==2.3.3",
+        "streamlit==1.55.0",
+        "plotly==6.6.0",
         "plotly-express==0.4.1",
     ],
     extras_require={
