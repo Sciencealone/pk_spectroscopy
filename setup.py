@@ -21,12 +21,13 @@ setup(
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     install_requires=[
-        "numpy==2.4.3",
+        "numpy==2.4.4",
         "scipy==1.17.1",
         "pandas==2.3.3",
-        "streamlit==1.55.0",
-        "plotly==6.6.0",
+        "streamlit==1.57.0",
+        "plotly==6.7.0",
         "plotly-express==0.4.1",
+        "bokeh==3.7.2",
     ],
     extras_require={
         "dev": ["pytest", "black", "ruff", "mypy", "coverage"],
