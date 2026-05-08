@@ -57,7 +57,7 @@ if uploaded_file is not None:
         row_counter += 1
 
     st.sidebar.markdown('''---''')
-    if titration_mode == 'Volumetric':
+    if titration_mode == TitrationMode.VOLUMETRIC:
         parameters = [
             ('Sample name', sample_name),
             ('Sample volume', sample_volume),
